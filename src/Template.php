@@ -79,8 +79,7 @@ class Template
 
         // Skip if the regex matches in the destination file
         if (!$force && $skipRegex && file_exists($filename)) {
-            $originalContent = file_get_contents($filename);
-            if (preg_match($skipRegex, $originalContent) !== false) {
+            if (preg_match($skipRegex, $this->getOriginalContent()) !== false) {
                 return null;
             }
         }
@@ -92,14 +91,13 @@ class Template
 
         // Insert the content at the given position (after or before)
         if ($inject) {
-            $originalContent = file_get_contents($filename);
             $regex = $this->getOption('before') ?: $this->getOption('after');
 
             if (!$regex) {
                 throw new Exception('You must define either "before" or "after" for the desired injection.');
             }
 
-            preg_match($regex, $originalContent, $matches, PREG_OFFSET_CAPTURE);
+            preg_match($regex, $this->getOriginalContent(), $matches, PREG_OFFSET_CAPTURE);
 
             if (empty($matches)) {
                 throw new Exception('No matches found for this injection.');
@@ -110,7 +108,7 @@ class Template
                 $offset += strlen($matches[0][0]);
             }
 
-            return substr_replace($originalContent, $this->content, $offset, 0);
+            return substr_replace($this->getOriginalContent(), $this->content, $offset, 0);
         }
 
         return $this->content;
@@ -128,6 +126,14 @@ class Template
             file_exists(dirname($to)) || mkdir(dirname($to), 0777, true);
             file_put_contents($to, $body);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getOriginalContent(): string
+    {
+        return file_get_contents($this->getOption('to'));
     }
 
     /**
