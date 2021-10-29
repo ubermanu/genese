@@ -1,10 +1,5 @@
 {
     "name": "ubermanu/genese",
-    "autoload": {
-        "psr-4": {
-            "Genese\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "ubermanu",
@@ -15,6 +10,19 @@
         "webuni/front-matter": "^1.3",
         "twig/twig": "^3.0",
         "symfony/console": "^5.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Genese\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Genese\\Tests\\": "tests/"
+        }
     },
     "bin": [
         "bin/genese"
