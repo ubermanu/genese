@@ -15,13 +15,25 @@ class Template
     protected array $options;
 
     /**
-     * @param string $content
-     * @param array $options
+     * @param string $filename
+     * @param array $params
+     * @throws Exception
      */
-    public function __construct(string $content, array $options = [])
+    public function __construct(string $filename, array $params = [])
     {
-        $this->content = $content;
-        $this->options = $options;
+        $twig = new \Twig\Environment(
+            new \Twig\Loader\FilesystemLoader(getcwd())
+        );
+
+        try {
+            $string = $twig->render($filename, $params);
+        } catch (\Twig\Error\LoaderError | \Twig\Error\RuntimeError | \Twig\Error\SyntaxError $e) {
+            throw new Exception($e->getMessage());
+        }
+
+        $fm = (new \Webuni\FrontMatter\FrontMatter)->parse($string);
+        $this->options = $fm->getData();
+        $this->content = $fm->getContent();
     }
 
     /**
@@ -80,6 +92,19 @@ class Template
         }
 
         return $this->content;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function execute(): void
+    {
+        $to = $this->getOption('to');
+        $body = $this->render();
+
+        if ($to && $body) {
+            file_put_contents($to, $body);
+        }
     }
 
     /**

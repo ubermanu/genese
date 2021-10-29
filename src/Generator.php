@@ -5,41 +5,14 @@ namespace Genese;
 final class Generator
 {
     /**
-     * @var \Twig\Environment
-     */
-    protected \Twig\Environment $twig;
-
-    /**
-     * @constructor
-     */
-    public function __construct()
-    {
-        $this->twig = new \Twig\Environment(
-            new \Twig\Loader\FilesystemLoader(getcwd())
-        );
-    }
-
-    /**
-     * @param string $filename
+     * @param string $generator
+     * @param string $action
      * @param array $params
      * @throws Exception
      */
-    public function execute(string $filename, array $params = []): void
+    public function execute(string $generator, string $action, array $params = []): void
     {
-        try {
-            $string = $this->twig->render($filename, $params);
-        } catch (\Twig\Error\LoaderError | \Twig\Error\RuntimeError | \Twig\Error\SyntaxError $e) {
-            throw new Exception($e->getMessage());
-        }
-
-        $fm = (new \Webuni\FrontMatter\FrontMatter)->parse($string);
-        $template = new Template($fm->getContent(), $fm->getData());
-
-        $to = $template->getOption('to');
-        $body = $template->render();
-
-        if ($to && $body) {
-            file_put_contents($to, $body);
-        }
+        $filename = sprintf('_templates/%s/%s', $generator, $action);
+        (new Template($filename, $params))->execute();
     }
 }
