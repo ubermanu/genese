@@ -2,6 +2,10 @@
 
 namespace Genese;
 
+use Twig\Environment as TwigEnvironment;
+use Twig\Loader\LoaderInterface;
+use Webuni\FrontMatter\FrontMatter;
+
 class Template
 {
     /**
@@ -15,30 +19,48 @@ class Template
     protected array $options;
 
     /**
+     * @var TwigEnvironment
+     */
+    protected TwigEnvironment $twig;
+
+    /**
+     * @var FrontMatter
+     */
+    protected FrontMatter $frontMatter;
+
+    /**
+     * @param LoaderInterface|null $loader
+     */
+    public function __construct(?LoaderInterface $loader = null)
+    {
+        $this->twig = new TwigEnvironment(
+            $loader ?? new \Twig\Loader\FilesystemLoader(getcwd())
+        );
+        $this->frontMatter = new FrontMatter();
+    }
+
+    /**
      * @param string $filename
      * @param array $params
+     * @return $this
      * @throws Exception
      */
-    public function __construct(string $filename, array $params = [])
+    public function load(string $filename, array $params = []): self
     {
-        $twig = new \Twig\Environment(
-            new \Twig\Loader\FilesystemLoader(getcwd())
-        );
-
         try {
-            $string = $twig->render($filename, $params);
+            $string = $this->twig->render($filename, $params);
         } catch (\Twig\Error\LoaderError | \Twig\Error\RuntimeError | \Twig\Error\SyntaxError $e) {
             throw new Exception($e->getMessage());
         }
 
-        $fm = (new \Webuni\FrontMatter\FrontMatter)->parse($string);
+        $fm = $this->frontMatter->parse($string);
         $this->options = $fm->getData();
         $this->content = $fm->getContent();
+
+        return $this;
     }
 
     /**
-     * TODO: Add processor for each setting (make it extensible)
-     *
      * @return string|null
      * @throws Exception
      */
@@ -102,7 +124,7 @@ class Template
         $to = $this->getOption('to');
         $body = $this->render();
 
-        if ($to && $body) {
+        if ($to && $body !== null) {
             file_exists(dirname($to)) || mkdir(dirname($to), 0777, true);
             file_put_contents($to, $body);
         }

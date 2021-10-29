@@ -27,13 +27,14 @@ class GeneratorCommand extends Command
     ];
 
     /**
-     * @param Generator $generator
-     * @param string|null $name
+     * @param string $generator
+     * @param string $action
+     * @param string $rootDir
      */
-    public function __construct(Generator $generator, ?string $name = null)
+    public function __construct(string $generator, string $action, string $rootDir)
     {
-        $this->generator = $generator;
-        parent::__construct($name);
+        $this->generator = new Generator($generator, $action, $rootDir);
+        parent::__construct(strtolower($generator) . ':' . strtolower($action));
     }
 
     /**
