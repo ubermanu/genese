@@ -1,5 +1,6 @@
 {
   "banner": false,
   "compression": "GZ",
-  "output": "dist/genese.phar"
+  "output": "dist/genese.phar",
+  "git-version": "git_version"
 }
