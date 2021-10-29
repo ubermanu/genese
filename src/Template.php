@@ -103,6 +103,7 @@ class Template
         $body = $this->render();
 
         if ($to && $body) {
+            file_exists(dirname($to)) || mkdir(dirname($to), 0777, true);
             file_put_contents($to, $body);
         }
     }
