@@ -9,7 +9,8 @@ if (file_exists(__DIR__ . '/../autoload.php')) {
 }
 
 $app = new \Symfony\Component\Console\Application('genese');
-$app->setVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
+// FIXME: Throws an error when compressed
+//$app->setVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
 
 // The root dir for all the templates
 $rootDir = '_templates';
