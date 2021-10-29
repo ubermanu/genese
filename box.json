@@ -1,4 +1,5 @@
 {
+  "banner": false,
   "compression": "GZ",
   "output": "dist/genese.phar"
 }
