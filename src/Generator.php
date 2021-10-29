@@ -12,7 +12,9 @@ final class Generator
      */
     public function execute(string $generator, string $action, array $params = []): void
     {
-        $filename = sprintf('_templates/%s/%s', $generator, $action);
-        (new Template($filename, $params))->execute();
+        foreach (glob('_templates/' . $generator . '/' . $action . '/*.t') as $filename)
+        {
+            (new Template($filename, $params))->execute();
+        }
     }
 }
