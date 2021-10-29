@@ -1,0 +1,22 @@
+{
+    "name": "ubermanu/genese",
+    "autoload": {
+        "psr-4": {
+            "Genese\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ubermanu",
+            "email": "manu@paca.happy-dev.fr"
+        }
+    ],
+    "require": {
+        "webuni/front-matter": "^1.3",
+        "twig/twig": "^3.0",
+        "symfony/console": "^5.3"
+    },
+    "bin": [
+        "bin/genese"
+    ]
+}
