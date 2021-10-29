@@ -15,6 +15,18 @@ class GeneratorCommand extends Command
     protected Generator $generator;
 
     /**
+     * @var string[]
+     */
+    protected array $excludedOptions = [
+        'help',
+        'quiet',
+        'verbose',
+        'version',
+        'ansi',
+        'no-interaction',
+    ];
+
+    /**
      * @param Generator $generator
      * @param string|null $name
      */
@@ -47,7 +59,7 @@ class GeneratorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $this->generator->execute($input->getArguments());
+            $this->generator->execute(array_diff_key($input->getOptions(), $this->excludedOptions));
             return Command::SUCCESS;
         } catch (Exception $e) {
             $output->write(sprintf('<error>%s</error>', $e->getMessage()));
