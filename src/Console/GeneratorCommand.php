@@ -72,16 +72,15 @@ class GeneratorCommand extends Command
                     && !$template->getOption('inject')
                     && !$template->getOption('unless_exists')
                 ) {
-                    $helper = $this->getHelper('question');
-                    $question = new ConfirmationQuestion(sprintf('<error>Overwrite %s? (y/N)</error>', $template->getOption('to')), false);
-                    if (!$helper->ask($input, $output, $question)) {
+                    $question = new ConfirmationQuestion(sprintf("<fg=red>Overwrite %s? (y/N)</>", $template->getOption('to')), false);
+                    if (!$this->getHelper('question')->ask($input, $output, $question)) {
                         continue;
                     }
                 }
 
                 if ($template->getOption('unless_exists') || $template->getOption('skip_if')) {
                     if (is_null($template->render())) {
-                        $output->writeln(sprintf('<comment>Skip %s</comment>', $template->getOption('to')));
+                        $output->writeln(sprintf("<fg=yellow>Skip %s</>", $template->getOption('to')));
                         continue;
                     }
                 }
@@ -89,7 +88,7 @@ class GeneratorCommand extends Command
                 $template->execute();
 
                 // Output the message
-                $message = $template->getOption('inject') ? '<comment>%s</comment>' : '<info>%s</info>';
+                $message = $template->getOption('inject') ? "<fg=magenta>Inject %s</>" : "<fg=green>Write %s</>";
                 $output->writeln(sprintf($message, $template->getOption('to')));
             }
 
