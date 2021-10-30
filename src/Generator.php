@@ -44,15 +44,16 @@ class Generator
 
     /**
      * Get the prompt configuration.
-     * @return array|null
+     * TODO: Check if the configuration is alright.
+     *
+     * @return array
      */
-    public function getConfig(): ?array
+    public function getConfig(): array
     {
-        try {
-            $filename = $this->rootDir . '/' . $this->name . '/' . $this->action . '/prompt.json';
-            return \json_decode(file_get_contents($filename), true);
-        } catch (\Exception $e) {
-            return null;
+        $filename = $this->rootDir . '/' . $this->name . '/' . $this->action . '/prompt.json';
+        if (file_exists($filename)) {
+            return @\json_decode(file_get_contents($filename), true) ?? [];
         }
+        return [];
     }
 }
