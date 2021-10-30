@@ -45,6 +45,9 @@ class GeneratorCommand extends Command
      */
     protected function configure()
     {
+        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite all the files without asking');
+        $this->addOption('dry-run', 'd', InputOption::VALUE_NONE, 'Check the output before the files are written');
+
         foreach ($this->generator->getConfig() as $item) {
             if (isset($item['name'])) {
                 $this->addOption(
@@ -72,11 +75,12 @@ class GeneratorCommand extends Command
             foreach ($this->generator->getTemplates($params) as $template) {
 
                 // Ask confirmation from the user if not specified into the template
-                // TODO: Add a global force argument to skip this
                 if ($template->getOption('force') != 'true'
                     && file_exists($template->getOption('to'))
                     && !$template->getOption('inject')
                     && !$template->getOption('unless_exists')
+                    && !$input->getOption('force')
+                    && !$input->getOption('dry-run')
                 ) {
                     $question = new ConfirmationQuestion(sprintf("<fg=red>Overwrite %s? (y/N)</>", $template->getOption('to')), false);
                     if (!$this->getHelper('question')->ask($input, $output, $question)) {
@@ -91,7 +95,9 @@ class GeneratorCommand extends Command
                     }
                 }
 
-                $template->execute();
+                if (!$input->getOption('dry-run')) {
+                    $template->execute();
+                }
 
                 // Output the message
                 $message = $template->getOption('inject') ? "<fg=magenta>Inject %s</>" : "<fg=green>Write %s</>";
