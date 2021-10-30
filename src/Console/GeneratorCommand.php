@@ -59,13 +59,31 @@ class GeneratorCommand extends Command
     {
         $output->writeln(sprintf('<info>Loading templates from %s</info>', $this->generator->getPath()));
 
-        $helper = $this->getHelper('question');
+        $this->askMissingOptions($input, $output);
         $options = array_diff_key($input->getOptions(), $this->excludedOptions);
+
+        try {
+            $this->generator->execute($options);
+            return Command::SUCCESS;
+        } catch (Exception $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            return Command::FAILURE;
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function askMissingOptions(InputInterface $input, OutputInterface $output): void
+    {
+        $helper = $this->getHelper('question');
 
         foreach ($this->generator->getConfig() as $item) {
             if (!isset($item['name']) || $input->getOption($item['name']) !== null) {
                 continue;
             }
+
             switch ($item['type'] ?? null) {
                 case 'confirmation':
                 {
@@ -85,16 +103,15 @@ class GeneratorCommand extends Command
                     break;
                 }
             }
+
+            $question->setTrimmable($item['trim'] ?? true);
+
+            if (isset($item['errorMessage'])) {
+                $question->setErrorMessage($item['errorMessage']);
+            }
+
             $res = $helper->ask($input, $output, $question);
             $input->setOption($item['name'], $res);
-        }
-
-        try {
-            $this->generator->execute($options);
-            return Command::SUCCESS;
-        } catch (Exception $e) {
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-            return Command::FAILURE;
         }
     }
 }
