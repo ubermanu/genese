@@ -29,6 +29,8 @@ class GeneratorCommand extends Command
         'version',
         'ansi',
         'no-interaction',
+        'force',
+        'dry-run',
     ];
 
     /**
@@ -45,9 +47,6 @@ class GeneratorCommand extends Command
      */
     protected function configure()
     {
-        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite all the files without asking');
-        $this->addOption('dry-run', 'd', InputOption::VALUE_NONE, 'Check the output before the files are written');
-
         foreach ($this->generator->getConfig() as $item) {
             if (isset($item['name'])) {
                 $this->addOption(
@@ -59,6 +58,9 @@ class GeneratorCommand extends Command
                 );
             }
         }
+
+        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite all the files without asking');
+        $this->addOption('dry-run', 'd', InputOption::VALUE_NONE, 'Check the output before the files are written');
     }
 
     /**
