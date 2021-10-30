@@ -1,6 +1,5 @@
 .idea
 vendor
-_templates
 .phpunit.*
 dist
 box.phar

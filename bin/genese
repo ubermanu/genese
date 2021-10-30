@@ -10,6 +10,7 @@ if (file_exists(__DIR__ . '/../autoload.php')) {
 
 $app = new \Symfony\Component\Console\Application('genese');
 $app->setVersion(\Genese\Genese::getVersion());
+$app->add(new \Genese\Console\InitCommand());
 
 // The root dir for all the templates
 $rootDir = '_templates';
@@ -17,7 +18,7 @@ $rootDir = '_templates';
 // Generates a new command for the available generators
 foreach (glob($rootDir . '/*/*') as $path) {
     $parts = explode(DIRECTORY_SEPARATOR, $path);
-    $command = new \Genese\GeneratorCommand($parts[1], $parts[2], $rootDir);
+    $command = new \Genese\Console\GeneratorCommand($parts[1], $parts[2], $rootDir);
     $app->add($command);
 }
 
