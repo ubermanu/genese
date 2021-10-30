@@ -105,6 +105,7 @@ class GeneratorCommand extends Command
             }
 
             $question->setTrimmable($item['trim'] ?? true);
+            $question->setHidden($item['hidden'] ?? false);
 
             if (isset($item['errorMessage'])) {
                 $question->setErrorMessage($item['errorMessage']);
