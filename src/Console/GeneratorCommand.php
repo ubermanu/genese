@@ -47,7 +47,13 @@ class GeneratorCommand extends Command
     {
         foreach ($this->generator->getConfig() as $item) {
             if (isset($item['name'])) {
-                $this->addOption($item['name'], $item['shortcut'] ?? null, InputOption::VALUE_OPTIONAL, $item['message'] ?? null);
+                $this->addOption(
+                    $item['name'],
+                    $item['shortcut'] ?? null,
+                    InputOption::VALUE_OPTIONAL,
+                    $item['message'] ?? null,
+                    $item['initial'] ?? null
+                );
             }
         }
     }
