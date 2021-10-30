@@ -109,7 +109,7 @@ class Template
             preg_match($regex, $this->getOriginalContent(), $matches, PREG_OFFSET_CAPTURE);
 
             if (empty($matches)) {
-                throw new Exception('No matches found for this injection.');
+                return null;
             }
 
             if ($this->hasOption('replace')) {
