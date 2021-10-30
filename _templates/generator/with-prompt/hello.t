@@ -1,16 +1,14 @@
 ---
-to: _templates/{{ name }}/{{ action | default('new') }}/hello.js.t
+to: _templates/{{ name }}/{{ action | default('new') }}/hello.php.t
 ---
 ---
-to: app/hello.js
+to: hello.php
 ---
-const hello = ```
-Hello!
-This is your first prompt based hygen template.
+<?php
 
+var_dump("Hello!
+This is your first prompt based Genèse template.
 Learn what it can do here:
+https://github.com/ubermanu/genese");
 
-https://github.com/jondot/hygen
-```
-
-console.log(hello)
+var_dump("{{ message | default('') }}");
