@@ -32,14 +32,12 @@ class GeneratorCommand extends Command
     ];
 
     /**
-     * @param string $generator
-     * @param string $action
-     * @param string $rootDir
+     * @param Generator $generator
      */
-    public function __construct(string $generator, string $action, string $rootDir)
+    public function __construct(Generator $generator)
     {
-        $this->generator = new Generator($generator, $action, $rootDir);
-        parent::__construct(strtolower($generator) . ':' . strtolower($action));
+        $this->generator = $generator;
+        parent::__construct();
     }
 
     /**
@@ -59,6 +57,8 @@ class GeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $output->writeln(sprintf('<info>Loading templates from %s</info>', $this->generator->getPath()));
+
         $helper = $this->getHelper('question');
         $options = array_diff_key($input->getOptions(), $this->excludedOptions);
 
@@ -93,7 +93,7 @@ class GeneratorCommand extends Command
             $this->generator->execute($options);
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $output->write(sprintf('<error>%s</error>', $e->getMessage()));
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             return Command::FAILURE;
         }
     }

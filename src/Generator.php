@@ -7,28 +7,14 @@ class Generator
     /**
      * @var string
      */
-    protected string $name;
+    protected string $path;
 
     /**
-     * @var string
+     * @param string $path
      */
-    protected string $action;
-
-    /**
-     * @var string
-     */
-    protected string $rootDir;
-
-    /**
-     * @param string $name
-     * @param string $action
-     * @param string $rootDir
-     */
-    public function __construct(string $name, string $action, string $rootDir = '_templates')
+    public function __construct(string $path)
     {
-        $this->name = $name;
-        $this->action = $action;
-        $this->rootDir = trim($rootDir, DIRECTORY_SEPARATOR);
+        $this->path = trim($path, DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -37,7 +23,7 @@ class Generator
      */
     public function execute(array $params = []): void
     {
-        foreach (glob($this->rootDir . '/' . $this->name . '/' . $this->action . '/*.t') as $filename) {
+        foreach (glob($this->path . '/*.t') as $filename) {
             (new Template)->load($filename, $params)->execute();
         }
     }
@@ -50,10 +36,18 @@ class Generator
      */
     public function getConfig(): array
     {
-        $filename = $this->rootDir . '/' . $this->name . '/' . $this->action . '/prompt.json';
+        $filename = $this->path . '/prompt.json';
         if (file_exists($filename)) {
             return @\json_decode(file_get_contents($filename), true) ?? [];
         }
         return [];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
     }
 }

@@ -14,17 +14,19 @@ $app->add(new \Genese\Console\InitCommand());
 
 try {
     $dotenv = new \Symfony\Component\Dotenv\Dotenv();
-    $dotenv->loadEnv(getcwd() . '/.env');
+    $dotenv->load(getcwd() . '/.env');
 } catch (\Symfony\Component\Dotenv\Exception\PathException $e) {
 }
 
 // The root dir for all the templates
-$rootDir = getenv('GENESE_TEMPLATES') ?: '_templates';
+$templatesDir = $_ENV['GENESE_TEMPLATES'] ?? '_templates';
 
 // Generates a new command for the available generators
-foreach (glob($rootDir . '/*/*') as $path) {
+foreach (glob($templatesDir . '/*/*') as $path) {
     $parts = explode(DIRECTORY_SEPARATOR, $path);
-    $command = new \Genese\Console\GeneratorCommand($parts[1], $parts[2], $rootDir);
+    $generator = new \Genese\Generator($templatesDir . '/' . $parts[1] . '/' . $parts[2]);
+    $command = new \Genese\Console\GeneratorCommand($generator);
+    $command->setName(strtolower($parts[1]) . ':' . strtolower($parts[2]));
     $app->add($command);
 }
 

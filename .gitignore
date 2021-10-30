@@ -4,3 +4,5 @@ vendor
 dist
 box.phar
 app
+.env*
+!.env.dist
