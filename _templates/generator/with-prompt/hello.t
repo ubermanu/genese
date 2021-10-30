@@ -1,5 +1,5 @@
 ---
-to: _templates/{{ name }}/{{ action || 'new' }/hello.js.t
+to: _templates/{{ name }}/{{ action | default('new') }}/hello.js.t
 ---
 ---
 to: app/hello.js
