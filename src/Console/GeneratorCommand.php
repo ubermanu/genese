@@ -75,7 +75,7 @@ class GeneratorCommand extends Command
                 case 'choice':
                 {
                     $question = new ChoiceQuestion($item['message'] ?? '', $item['choices'] ?? [], $item['initial'] ?? '0');
-                    $question->setMultiselect($item['multiselect'] ?? false);
+                    $question->setMultiselect($item['multiple'] ?? false);
                     break;
                 }
                 case 'input':
