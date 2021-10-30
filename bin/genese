@@ -9,11 +9,17 @@ if (file_exists(__DIR__ . '/../autoload.php')) {
 }
 
 $app = new \Symfony\Component\Console\Application('genese');
-$app->setVersion(\Genese\Genese::getVersion());
+$app->setVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
 $app->add(new \Genese\Console\InitCommand());
 
+try {
+    $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+    $dotenv->loadEnv(getcwd() . '/.env');
+} catch (\Symfony\Component\Dotenv\Exception\PathException $e) {
+}
+
 // The root dir for all the templates
-$rootDir = '_templates';
+$rootDir = getenv('GENESE_TEMPLATES') ?: '_templates';
 
 // Generates a new command for the available generators
 foreach (glob($rootDir . '/*/*') as $path) {

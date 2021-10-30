@@ -2,5 +2,23 @@
   "banner": false,
   "compression": "GZ",
   "output": "dist/genese.phar",
-  "git-version": "git_version"
+  "directories": [
+    "_templates",
+    "bin",
+    "src"
+  ],
+  "finder": [
+    {
+      "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
+      "exclude": [
+        "doc",
+        "test",
+        "test_old",
+        "tests",
+        "Tests",
+        "vendor-bin"
+      ],
+      "in": "vendor"
+    }
+  ]
 }
