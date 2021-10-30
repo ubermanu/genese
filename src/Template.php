@@ -67,10 +67,19 @@ class Template
     public function render(): ?string
     {
         $filename = $this->getOption('to');
+        $from = $this->getOption('from');
         $force = $this->getOption('force') ?? false;
         $unlessExists = $this->getOption('unless_exists');
         $skipRegex = $this->getOption('skip_if');
         $inject = $this->getOption('inject');
+
+        // Load the source content
+        if ($from) {
+            if (!file_exists($from)) {
+                throw new Exception(sprintf('The source file cannot be found (from: %s)', $from));
+            }
+            $this->content = file_get_contents($from);
+        }
 
         // Skip if the file already exists
         if (!$force && $unlessExists == 'true' && file_exists($filename)) {

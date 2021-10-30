@@ -134,6 +134,17 @@ END;
     }
 
     /**
+     * @covers
+     * @throws Exception
+     */
+    public function testCanCreateFileFrom()
+    {
+        $template = $this->create('07-test-from.t');
+        $template->execute();
+        $this->assertEquals('<p>Hello</p>', trim($template->getOriginalContent()));
+    }
+
+    /**
      * @param string $filename
      * @param array $params
      * @return Template
