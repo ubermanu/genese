@@ -91,7 +91,7 @@ class Template
 
         // Insert the content at the given position (after or before)
         if ($inject) {
-            $regex = $this->getOption('before') ?: $this->getOption('after');
+            $regex = $this->getOption('before') ?: $this->getOption('after') ?: $this->getOption('replace');
 
             if (!$regex) {
                 throw new Exception('You must define either "before" or "after" for the desired injection.');
@@ -103,12 +103,15 @@ class Template
                 throw new Exception('No matches found for this injection.');
             }
 
-            $offset = $matches[0][1];
-            if (!$this->hasOption('before')) {
-                $offset += strlen($matches[0][0]);
+            if ($this->hasOption('replace')) {
+                return substr_replace($this->getOriginalContent(), $this->content, $matches[0][1], strlen($matches[0][0]));
+            } else {
+                $offset = $matches[0][1];
+                if (!$this->hasOption('before')) {
+                    $offset += strlen($matches[0][0]);
+                }
+                return substr_replace($this->getOriginalContent(), $this->content, $offset, 0);
             }
-
-            return substr_replace($this->getOriginalContent(), $this->content, $offset, 0);
         }
 
         return $this->content;

@@ -114,6 +114,26 @@ END;
     }
 
     /**
+     * @covers
+     * @depends testCanInjectFileAfter
+     * @throws Exception
+     */
+    public function testCanInjectFileReplace()
+    {
+        $expected = <<<END
+<?php
+
+abstract class Test extends \Exception
+{
+}
+END;
+
+        $template = $this->create('06-inject-class-replace.t');
+        $template->execute();
+        $this->assertEquals($expected, trim($template->getOriginalContent()));
+    }
+
+    /**
      * @param string $filename
      * @param array $params
      * @return Template
