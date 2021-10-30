@@ -57,13 +57,42 @@ class GeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln(sprintf('<info>Loading templates from %s</info>', $this->generator->getPath()));
+        $output->writeln(sprintf('Loading templates from %s', $this->generator->getPath()));
 
         $this->askMissingOptions($input, $output);
-        $options = array_diff_key($input->getOptions(), $this->excludedOptions);
+        $params = array_diff_key($input->getOptions(), $this->excludedOptions);
 
         try {
-            $this->generator->execute($options);
+            foreach ($this->generator->getTemplates($params) as $template) {
+
+                // Ask confirmation from the user if not specified into the template
+                // TODO: Add a global force argument to skip this
+                if ($template->getOption('force') != 'true'
+                    && file_exists($template->getOption('to'))
+                    && !$template->getOption('inject')
+                    && !$template->getOption('unless_exists')
+                ) {
+                    $helper = $this->getHelper('question');
+                    $question = new ConfirmationQuestion(sprintf('<error>Overwrite %s? (y/N)</error>', $template->getOption('to')), false);
+                    if (!$helper->ask($input, $output, $question)) {
+                        continue;
+                    }
+                }
+
+                if ($template->getOption('unless_exists') || $template->getOption('skip_if')) {
+                    if (is_null($template->render())) {
+                        $output->writeln(sprintf('<comment>Skip %s</comment>', $template->getOption('to')));
+                        continue;
+                    }
+                }
+
+                $template->execute();
+
+                // Output the message
+                $message = $template->getOption('inject') ? '<comment>%s</comment>' : '<info>%s</info>';
+                $output->writeln(sprintf($message, $template->getOption('to')));
+            }
+
             return Command::SUCCESS;
         } catch (Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));

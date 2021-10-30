@@ -23,9 +23,23 @@ class Generator
      */
     public function execute(array $params = []): void
     {
-        foreach (glob($this->path . '/*.t') as $filename) {
-            (new Template)->load($filename, $params)->execute();
+        foreach ($this->getTemplates($params) as $template) {
+            $template->execute();
         }
+    }
+
+    /**
+     * @param array $params
+     * @return Template[]
+     * @throws Exception
+     */
+    public function getTemplates(array $params = []): array
+    {
+        $templates = [];
+        foreach (glob($this->path . '/*.t') as $filename) {
+            $templates[] = (new Template)->load($filename, $params);
+        }
+        return $templates;
     }
 
     /**
