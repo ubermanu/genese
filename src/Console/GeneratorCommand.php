@@ -93,7 +93,7 @@ class GeneratorCommand extends Command
             }
 
             // Create a message from the name if not defined in the prompt.json
-            $message = ($item['message'] ?? ucfirst($item['name']) . '?') . ' ';
+            $message = sprintf('<fg=cyan>?</> %s ', ($item['message'] ?? ucfirst($item['name']) . '?'));
 
             switch ($item['type'] ?? null) {
                 case 'confirmation':
@@ -145,7 +145,7 @@ class GeneratorCommand extends Command
                     && !$input->getOption('force')
                     && !$input->getOption('dry-run')
                 ) {
-                    $question = new ConfirmationQuestion(sprintf("<fg=red>Overwrite %s? (y/N)</> ", $template->getOption('to')), false);
+                    $question = new ConfirmationQuestion(sprintf("\t<fg=red>exists: %s, Overwrite? (y/N)</> ", $template->getOption('to')), false);
                     if (!$this->getHelper('question')->ask($input, $output, $question)) {
                         continue;
                     }
@@ -153,7 +153,7 @@ class GeneratorCommand extends Command
 
                 if ($template->getOption('unless_exists') || $template->getOption('skip_if')) {
                     if (is_null($template->render())) {
-                        $output->writeln(sprintf("<fg=yellow>Skip %s</>", $template->getOption('to')));
+                        $output->writeln(sprintf("\t<fg=yellow>skipped: %s</>", $template->getOption('to')));
                         continue;
                     }
                 }
@@ -163,7 +163,7 @@ class GeneratorCommand extends Command
                 }
 
                 // Output the message
-                $message = $template->getOption('inject') ? "<fg=magenta>Inject %s</>" : "<fg=green>Write %s</>";
+                $message = $template->getOption('inject') ? "\t<fg=magenta>inject: %s</>" : "\t<fg=green>added: %s</>";
                 $output->writeln(sprintf($message, $template->getOption('to')));
             }
 
