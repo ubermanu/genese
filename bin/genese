@@ -8,8 +8,13 @@ if (file_exists(__DIR__ . '/../autoload.php')) {
     require_once __DIR__ . '/../../../autoload.php';
 }
 
+$version = '@git_tag@';
+if (str_starts_with($version, '@')) {
+    $version = \Composer\InstalledVersions::getRootPackage()['pretty_version'];
+}
+
 $app = new \Symfony\Component\Console\Application('genese');
-$app->setVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
+$app->setVersion($version);
 $app->add(new \Genese\Console\InitCommand());
 
 try {
