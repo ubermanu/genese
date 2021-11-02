@@ -5,6 +5,7 @@ namespace Genese\Console;
 use Genese\Exception;
 use Genese\Generator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,12 +35,23 @@ class GeneratorCommand extends Command
     ];
 
     /**
+     * @var InputDefinition
+     */
+    protected InputDefinition $fullDefinition;
+
+    /**
+     * @var InputDefinition
+     */
+    protected InputDefinition $definition;
+
+    /**
      * @param Generator $generator
      */
     public function __construct(Generator $generator)
     {
         $this->generator = $generator;
         parent::__construct();
+        $this->definition = new CustomInputDefinition();
     }
 
     /**
@@ -66,11 +78,61 @@ class GeneratorCommand extends Command
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $output->writeln(sprintf('Loading templates from %s', $this->generator->getPath()));
+    }
 
-        $this->askMissingOptions($input, $output);
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function interact(InputInterface $input, OutputInterface $output): void
+    {
+        $helper = $this->getHelper('question');
+
+        foreach ($this->generator->getConfig() as $item) {
+            if (!isset($item['name']) || $input->getOption($item['name']) !== null) {
+                continue;
+            }
+
+            switch ($item['type'] ?? null) {
+                case 'confirmation':
+                {
+                    $question = new ConfirmationQuestion($item['message'] ?? '', boolval($item['initial'] ?? true));
+                    break;
+                }
+                case 'choice':
+                {
+                    $question = new ChoiceQuestion($item['message'] ?? '', $item['choices'] ?? [], $item['initial'] ?? '0');
+                    $question->setMultiselect($item['multiple'] ?? false);
+                    break;
+                }
+                case 'input':
+                default:
+                {
+                    $question = new Question($item['message'] ?? '', $item['initial'] ?? null);
+                    break;
+                }
+            }
+
+            $question->setTrimmable($item['trim'] ?? true);
+            $question->setHidden($item['hidden'] ?? false);
+
+            if (isset($item['errorMessage'])) {
+                $question->setErrorMessage($item['errorMessage']);
+            }
+
+            $res = $helper->ask($input, $output, $question);
+            $input->setOption($item['name'], $res);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $params = array_diff_key($input->getOptions(), $this->excludedOptions);
 
         try {
@@ -114,47 +176,31 @@ class GeneratorCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @inheritDoc
      */
-    protected function askMissingOptions(InputInterface $input, OutputInterface $output): void
+    public function mergeApplicationDefinition(bool $mergeArgs = true)
     {
-        $helper = $this->getHelper('question');
-
-        foreach ($this->generator->getConfig() as $item) {
-            if (!isset($item['name']) || $input->getOption($item['name']) !== null) {
-                continue;
-            }
-
-            switch ($item['type'] ?? null) {
-                case 'confirmation':
-                {
-                    $question = new ConfirmationQuestion($item['message'] ?? '', boolval($item['initial'] ?? true));
-                    break;
-                }
-                case 'choice':
-                {
-                    $question = new ChoiceQuestion($item['message'] ?? '', $item['choices'] ?? [], $item['initial'] ?? '0');
-                    $question->setMultiselect($item['multiple'] ?? false);
-                    break;
-                }
-                case 'input':
-                default:
-                {
-                    $question = new Question($item['message'] ?? '', $item['initial'] ?? null);
-                    break;
-                }
-            }
-
-            $question->setTrimmable($item['trim'] ?? true);
-            $question->setHidden($item['hidden'] ?? false);
-
-            if (isset($item['errorMessage'])) {
-                $question->setErrorMessage($item['errorMessage']);
-            }
-
-            $res = $helper->ask($input, $output, $question);
-            $input->setOption($item['name'], $res);
+        if (null === $this->getApplication()) {
+            return;
         }
+
+        $this->fullDefinition = new CustomInputDefinition();
+        $this->fullDefinition->setOptions($this->definition->getOptions());
+        $this->fullDefinition->addOptions($this->getApplication()->getDefinition()->getOptions());
+
+        if ($mergeArgs) {
+            $this->fullDefinition->setArguments($this->getApplication()->getDefinition()->getArguments());
+            $this->fullDefinition->addArguments($this->definition->getArguments());
+        } else {
+            $this->fullDefinition->setArguments($this->definition->getArguments());
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDefinition()
+    {
+        return $this->fullDefinition ?? $this->definition;
     }
 }
