@@ -1,11 +1,10 @@
 <?php
 
-namespace Genese\Console;
+namespace Genese\Console\Command;
 
 use Genese\Exception;
 use Genese\Generator;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,7 +12,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class GeneratorCommand extends Command
+class GeneratorCommand extends CustomCommand
 {
     /**
      * @var Generator
@@ -35,11 +34,6 @@ class GeneratorCommand extends Command
     ];
 
     /**
-     * @var InputDefinition
-     */
-    protected InputDefinition $customDefinition;
-
-    /**
      * @param Generator $generator
      */
     public function __construct(Generator $generator)
@@ -49,11 +43,11 @@ class GeneratorCommand extends Command
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setDefinition(new CustomInputDefinition());
+        parent::configure();
 
         foreach ($this->generator->getConfig() as $item) {
             if (isset($item['name'])) {
@@ -72,7 +66,7 @@ class GeneratorCommand extends Command
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
@@ -80,8 +74,7 @@ class GeneratorCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * {@inheritdoc}
      */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
@@ -128,7 +121,7 @@ class GeneratorCommand extends Command
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -167,45 +160,24 @@ class GeneratorCommand extends Command
                 $output->writeln(sprintf($message, $template->getOption('to')));
             }
 
-            return Command::SUCCESS;
         } catch (Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             return Command::FAILURE;
         }
+
+        return Command::SUCCESS;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function mergeApplicationDefinition(bool $mergeArgs = true)
     {
-        if (null === $this->getApplication()) {
-            return;
-        }
+        parent::mergeApplicationDefinition($mergeArgs);
 
-        $definition = parent::getDefinition();
-
-        $this->customDefinition = new CustomInputDefinition();
-        $this->customDefinition->setOptions($definition->getOptions());
-        $this->customDefinition->addOptions($this->getApplication()->getDefinition()->getOptions());
-
+        // Reset all the default values to force user interaction
         foreach ($this->customDefinition->getOptions() as $option) {
             $option->setDefault(null);
         }
-
-        if ($mergeArgs) {
-            $this->customDefinition->setArguments($this->getApplication()->getDefinition()->getArguments());
-            $this->customDefinition->addArguments($definition->getArguments());
-        } else {
-            $this->customDefinition->setArguments($definition->getArguments());
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDefinition()
-    {
-        return $this->customDefinition ?? parent::getDefinition();
     }
 }

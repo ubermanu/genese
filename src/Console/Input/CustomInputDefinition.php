@@ -1,17 +1,18 @@
 <?php
 
-namespace Genese\Console;
+namespace Genese\Console\Input;
 
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Custom input definition that allows undefined options.
  * If the option does not exist, returns an optional one.
  */
-class CustomInputDefinition extends \Symfony\Component\Console\Input\InputDefinition
+class CustomInputDefinition extends InputDefinition
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function hasOption(string $name)
     {
@@ -19,7 +20,7 @@ class CustomInputDefinition extends \Symfony\Component\Console\Input\InputDefini
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function hasShortcut(string $name)
     {
@@ -27,7 +28,7 @@ class CustomInputDefinition extends \Symfony\Component\Console\Input\InputDefini
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getOption(string $name)
     {

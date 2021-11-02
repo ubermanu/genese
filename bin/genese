@@ -15,7 +15,7 @@ if (str_starts_with($version, '@')) {
 
 $app = new \Symfony\Component\Console\Application('genese');
 $app->setVersion($version);
-$app->add(new \Genese\Console\InitCommand());
+$app->add(new \Genese\Console\Command\InitCommand());
 
 try {
     $dotenv = new \Symfony\Component\Dotenv\Dotenv();
@@ -30,7 +30,7 @@ $templatesDir = $_ENV['GENESE_TEMPLATES'] ?? '_templates';
 foreach (glob($templatesDir . '/*/*') as $path) {
     $parts = explode(DIRECTORY_SEPARATOR, $path);
     $generator = new \Genese\Generator($templatesDir . '/' . $parts[1] . '/' . $parts[2]);
-    $command = new \Genese\Console\GeneratorCommand($generator);
+    $command = new \Genese\Console\Command\GeneratorCommand($generator);
     $command->setName(strtolower($parts[1]) . ':' . strtolower($parts[2]));
     $app->add($command);
 }
