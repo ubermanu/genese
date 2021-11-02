@@ -11,4 +11,4 @@ This is your first prompt based Genèse template.
 Learn what it can do here:
 https://github.com/ubermanu/genese");
 
-var_dump("{{ message | default('') }}");
+var_dump("{{ '{{' }} message | default('') {{ '}}' }}");
