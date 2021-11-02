@@ -37,12 +37,7 @@ class GeneratorCommand extends Command
     /**
      * @var InputDefinition
      */
-    protected InputDefinition $fullDefinition;
-
-    /**
-     * @var InputDefinition
-     */
-    protected InputDefinition $definition;
+    protected InputDefinition $customDefinition;
 
     /**
      * @param Generator $generator
@@ -51,7 +46,6 @@ class GeneratorCommand extends Command
     {
         $this->generator = $generator;
         parent::__construct();
-        $this->definition = new CustomInputDefinition();
     }
 
     /**
@@ -59,6 +53,8 @@ class GeneratorCommand extends Command
      */
     protected function configure()
     {
+        $this->setDefinition(new CustomInputDefinition());
+
         foreach ($this->generator->getConfig() as $item) {
             if (isset($item['name'])) {
                 $this->addOption(
@@ -187,15 +183,17 @@ class GeneratorCommand extends Command
             return;
         }
 
-        $this->fullDefinition = new CustomInputDefinition();
-        $this->fullDefinition->setOptions($this->definition->getOptions());
-        $this->fullDefinition->addOptions($this->getApplication()->getDefinition()->getOptions());
+        $definition = parent::getDefinition();
+
+        $this->customDefinition = new CustomInputDefinition();
+        $this->customDefinition->setOptions($definition->getOptions());
+        $this->customDefinition->addOptions($this->getApplication()->getDefinition()->getOptions());
 
         if ($mergeArgs) {
-            $this->fullDefinition->setArguments($this->getApplication()->getDefinition()->getArguments());
-            $this->fullDefinition->addArguments($this->definition->getArguments());
+            $this->customDefinition->setArguments($this->getApplication()->getDefinition()->getArguments());
+            $this->customDefinition->addArguments($definition->getArguments());
         } else {
-            $this->fullDefinition->setArguments($this->definition->getArguments());
+            $this->customDefinition->setArguments($definition->getArguments());
         }
     }
 
@@ -204,6 +202,6 @@ class GeneratorCommand extends Command
      */
     public function getDefinition()
     {
-        return $this->fullDefinition ?? $this->definition;
+        return $this->customDefinition ?? parent::getDefinition();
     }
 }
