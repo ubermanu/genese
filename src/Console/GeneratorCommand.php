@@ -189,6 +189,10 @@ class GeneratorCommand extends Command
         $this->customDefinition->setOptions($definition->getOptions());
         $this->customDefinition->addOptions($this->getApplication()->getDefinition()->getOptions());
 
+        foreach ($this->customDefinition->getOptions() as $option) {
+            $option->setDefault(null);
+        }
+
         if ($mergeArgs) {
             $this->customDefinition->setArguments($this->getApplication()->getDefinition()->getArguments());
             $this->customDefinition->addArguments($definition->getArguments());
