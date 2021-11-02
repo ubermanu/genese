@@ -130,9 +130,10 @@ class GeneratorCommand extends CustomCommand
         try {
             foreach ($this->generator->getTemplates($params) as $template) {
 
-                // Ask confirmation from the user if not specified into the template
-                if ($template->getOption('force') != 'true'
-                    && file_exists($template->getOption('to'))
+                // If the file that the template outputs exists,
+                // Ask confirmation from the user if not specified into the template settings
+                if (file_exists($template->getOption('to'))
+                    && !$template->getOption('force')
                     && !$template->getOption('inject')
                     && !$template->getOption('unless_exists')
                     && !$input->getOption('force')
