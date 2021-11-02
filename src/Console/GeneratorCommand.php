@@ -111,7 +111,7 @@ class GeneratorCommand extends Command
                 case 'input':
                 default:
                 {
-                    $question = new Question($item['message'] ?? '', $item['initial'] ?? null);
+                    $question = new Question(($item['message'] ?? '') . ' ', $item['initial'] ?? null);
                     break;
                 }
             }
