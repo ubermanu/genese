@@ -2,6 +2,8 @@
 
 namespace Genese;
 
+use Symfony\Component\Yaml\Yaml;
+
 class Generator
 {
     /**
@@ -50,9 +52,12 @@ class Generator
      */
     public function getConfig(): array
     {
-        $filename = $this->path . '/prompt.json';
+        $filename = $this->path . '/prompt.yaml';
+        if (!file_exists($filename)) {
+            $filename = $this->path . '/prompt.yml';
+        }
         if (file_exists($filename)) {
-            return @\json_decode(file_get_contents($filename), true) ?? [];
+            return Yaml::parseFile($filename);
         }
         return [];
     }
