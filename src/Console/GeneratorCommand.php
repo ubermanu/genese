@@ -149,7 +149,7 @@ class GeneratorCommand extends Command
                     && !$input->getOption('force')
                     && !$input->getOption('dry-run')
                 ) {
-                    $question = new ConfirmationQuestion(sprintf("<fg=red>Overwrite %s? (y/N)</>", $template->getOption('to')), false);
+                    $question = new ConfirmationQuestion(sprintf("<fg=red>Overwrite %s? (y/N)</> ", $template->getOption('to')), false);
                     if (!$this->getHelper('question')->ask($input, $output, $question)) {
                         continue;
                     }
