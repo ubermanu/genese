@@ -139,7 +139,10 @@ class GeneratorCommand extends CustomCommand
                     && !$input->getOption('force')
                     && !$input->getOption('dry-run')
                 ) {
-                    $question = new ConfirmationQuestion(sprintf("\t<fg=red>exists: %s, Overwrite? (y/N)</> ", $template->getOption('to')), false);
+                    $question = new ConfirmationQuestion(
+                        sprintf("\t<fg=red>exists: %s, Overwrite? (y/N)</> ", $template->getOption('to')),
+                        false
+                    );
                     if (!$this->getHelper('question')->ask($input, $output, $question)) {
                         continue;
                     }
@@ -157,8 +160,10 @@ class GeneratorCommand extends CustomCommand
                 }
 
                 // Output the message
-                $message = $template->getOption('inject') ? "\t<fg=magenta>inject: %s</>" : "\t<fg=green>added: %s</>";
-                $output->writeln(sprintf($message, $template->getOption('to')));
+                $output->writeln(sprintf(
+                    $template->getOption('inject') ? "\t<fg=magenta>inject: %s</>" : "\t<fg=green>added: %s</>",
+                    $template->getOption('to')
+                ));
             }
 
         } catch (Exception $e) {
