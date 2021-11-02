@@ -65,7 +65,7 @@ class GeneratorCommand extends Command
                     $item['name'],
                     $item['shortcut'] ?? null,
                     InputOption::VALUE_OPTIONAL,
-                    $item['message'] ?? null,
+                    $item['message'] ?? '',
                     $item['initial'] ?? null
                 );
             }
@@ -96,22 +96,25 @@ class GeneratorCommand extends Command
                 continue;
             }
 
+            // Create a message from the name if not defined in the prompt.json
+            $message = ($item['message'] ?? ucfirst($item['name']) . '?') . ' ';
+
             switch ($item['type'] ?? null) {
                 case 'confirmation':
                 {
-                    $question = new ConfirmationQuestion($item['message'] ?? '', boolval($item['initial'] ?? true));
+                    $question = new ConfirmationQuestion($message, boolval($item['initial'] ?? true));
                     break;
                 }
                 case 'choice':
                 {
-                    $question = new ChoiceQuestion($item['message'] ?? '', $item['choices'] ?? [], $item['initial'] ?? '0');
+                    $question = new ChoiceQuestion($message, $item['choices'] ?? [], $item['initial'] ?? '0');
                     $question->setMultiselect($item['multiple'] ?? false);
                     break;
                 }
                 case 'input':
                 default:
                 {
-                    $question = new Question(($item['message'] ?? '') . ' ', $item['initial'] ?? null);
+                    $question = new Question($message, $item['initial'] ?? null);
                     break;
                 }
             }
